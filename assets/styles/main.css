@@ -1,0 +1,305 @@
+*{
+    margin: 0%;
+    padding: 0%;
+}
+::-webkit-scrollbar{
+    width: 7px !important;
+}
+::-webkit-scrollbar-track {
+    background: rgb(255, 254, 254);
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(233, 233, 233);
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(214, 214, 214);
+}
+/* login and Signup styles up to line 96*/
+.main-card{
+    width: 65%;
+    float: right;
+    height: 500px;
+}
+.logo-img {
+    float: left;
+    margin-top: 4%;
+}
+.auth-btn {
+    width: 50%;
+    height: 50;
+    font-weight: 300;
+    color: white !important;
+    background: radial-gradient(#24B56F, #22AA68);
+}
+.input-field{
+    width: 350px;
+    height: 60px;
+    border-style: none !important;
+}
+.validation-error {
+    color: red;
+    font-size: 12px;
+}
+.form_errors {
+    background-color: #FEDBDB;
+    width: 85%;
+    height: 45px;
+    padding: 8px 0px 0px 30px;
+    color: red;
+    border-radius: 5px;
+    border: 1px solid red;
+}
+.inner-row {
+    margin: auto !important;
+    height: inherit;
+    border-radius: inherit;
+}
+.inner-card h2 {
+    color: #15A25E;
+    font-weight: 400;
+}
+.inner-card h3 {
+    font-weight: 300;
+}
+.side-card-login {
+    background: radial-gradient(#24B56F, #22AA68);
+    border-top-left-radius: unset;
+    border-top-right-radius: inherit;
+    border-bottom-right-radius: inherit;
+    border-bottom-left-radius: unset;
+}
+.side-card-signup {
+    background: radial-gradient(#24B56F, #22AA68);
+    border-top-left-radius: inherit;
+    border-top-right-radius: unset;
+    border-bottom-right-radius: unset;
+    border-bottom-left-radius: inherit;
+}
+.side-card-login h1, .side-card-signup h1{
+    color: #FFFFFF;
+    padding: 20px;
+    font-weight: 300;
+}
+.side-card-login p, .side-card-signup p {
+    color: #FFFFFF;
+    padding: 10px 30px 30px 30px;
+    font-weight: 100;
+}
+.signup {
+    box-shadow: none !important;
+    border: 1px solid white;
+}
+.side-row {
+    margin-top: 30% !important;
+}
+/* styles for navBar component */
+.navbar{
+    background-color: #ffffff !important;
+}
+.sub-menu {
+    margin-right: 5% !important;
+}
+.search-icon {
+    display: none !important;
+}
+/* styles for dashboard home */
+.head-card {
+    width: inherit;
+    background-color: #64C5B1 !important;
+    padding: 20px;
+    color: #fff !important;
+    height: 160px;
+    border-radius: 0px !important;
+    margin-left: 0px !important;
+    font-weight: 100 !important;
+}
+.add-project-btn {
+    width: 20%;
+    background-color: white !important;
+    color: #64C5B1 !important;
+    margin: 2% 5% 0% 0%;
+}
+.add-project-btn:hover {
+    width: 20%;
+    background-color: #2185D0 !important;
+    color: #ffffff !important;
+    margin: 2% 5% 0% 0%;
+}
+.view-cards {
+    margin-left: 3%;
+    margin-top: 2%;
+}
+.overview-cards {
+    margin-top: -4%;
+}
+.first-card {
+    margin-left: 4%;
+}
+.overview-card-text {
+    background-color: #DCEBF4;
+    width: 90% !important;
+    height: 70px;
+    margin-left: 5%;
+    margin-top: 10%;
+    border-radius: 7px !important;
+    font-size: 70px !important;
+    padding-top: 8% !important;
+    font-weight: 300 !important;
+}
+.side-overview-card {
+
+    min-width: 100px;
+    width: 90%;
+    margin-left: 6%;
+    border-radius: 10px;
+    padding-left: 10px;
+    margin-top: -12%;
+}
+.next {
+    margin-top: 8% !important;
+}
+.side-overview-icon {
+    margin-right: 20%;
+}
+
+.bottom{
+    margin-top: 30px;
+}
+/* styles for new project page*/
+.head-card-project {
+    width: inherit;
+    background-color: #64C5B1 !important;
+    color: #F2EDDf !important;
+    padding: 20px;
+    height: 90px;
+    border-radius: 0px !important;
+    margin-left: 0px !important;
+    font-weight: 100 !important;
+}
+.new-project-form {
+    width: 95%;
+    padding: 1% 1% 3% 1%;
+    border-radius: 10px;
+}
+/* .new-project-form label {
+    font-weight: 300;
+} */
+.new-project-form .v-btn {
+    float: right;
+}
+/* styles for groups' page*/
+.group .v-btn{
+    margin-right: 3%;
+}
+.group {
+    height: 450px;
+}
+
+/* styles for activities page */
+
+.choose-group {
+    padding: 1%;
+
+}
+.group-activities-details1 {
+    min-height: 400px;
+    max-height: 400px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.group-activities-details2 {
+    min-height: 225px;
+    max-height: 325px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.time-paid {
+    padding: 0% !important;
+    margin: 0% !important;
+    max-width: 25.670% !important;
+    
+}
+.time-paid span{
+    font-size: 10px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.payment-details {
+ margin-top: 1%;
+}
+
+.payment-details-card {
+    padding: 3%;
+    margin-top: 2% !important;
+}
+.payment-details-title {
+    padding: 2%;
+}
+.payment-details-title h3 h5 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.sumary-item{
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 5px;
+}
+.theme--light.v-timeline:before {
+    background: orange !important;
+}
+.options .v-input, .options .v-input__control{
+    max-width: 130px;
+    margin-left: 5%;
+}
+
+/* styles for new group page */
+
+.new-group {
+    width: 80%;
+    margin-top: 5%;
+
+}
+.new-group-text p{
+    padding: 1% 10% 0% 2%;
+
+}
+.new-group-next {
+    margin-right: 10%;
+}
+@media only screen and (max-width: 1264px) {
+    .toggle {
+       display: block !important;
+       margin: 0% 2% 0% 2%;
+    }
+}
+@media only screen and (max-width: 730px) {
+    .search-icon {
+       display: block !important;
+       margin: 0% 2% 0% 2%;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .main-card{
+        width: 80%;
+        float: right;
+        height: 700px;
+    }
+    .side-card-login {
+        background: radial-gradient(#24B56F, #22AA68);
+        border-top-left-radius: unset;
+        border-top-right-radius: unset;
+        border-bottom-right-radius: inherit;
+        border-bottom-left-radius: inherit;
+    }
+    .side-card-signup {
+        background: radial-gradient(#24B56F, #22AA68);
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: unset;
+        border-bottom-left-radius: unset;
+    }
+    .side-row {
+        margin-top: 5% !important;
+        padding-bottom: 10% !important;
+    }
+}
