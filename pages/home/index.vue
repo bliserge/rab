@@ -35,18 +35,20 @@
                 <v-card-title> Total Cooperatives </v-card-title>
                 <v-card-subtitle> Jul, 08 2021 </v-card-subtitle>
               </v-col>
-              <v-chip color="info" class="mt-5 mr-5">{{copNum}}</v-chip>
+              <v-chip color="info" class="mt-5 mr-5">{{ copNum }}</v-chip>
             </v-row>
           </v-card>
         </v-col>
         <v-col>
-          <v-card elevation="0" class="side-overview-card ">
+          <v-card elevation="0" class="side-overview-card">
             <v-row justify="space-between">
               <v-col>
                 <v-card-title> Total income </v-card-title>
                 <v-card-subtitle> Jul, 08 2021 </v-card-subtitle>
               </v-col>
-              <v-chip color="success" class="mt-5 mr-5">{{income}} Rwf</v-chip>
+              <v-chip color="success" class="mt-5 mr-5"
+                >{{ income }} Rwf</v-chip
+              >
             </v-row>
           </v-card>
         </v-col>
@@ -57,14 +59,20 @@
                 <v-card-title> Calculated Loss </v-card-title>
                 <v-card-subtitle> Jul, 08 2021 </v-card-subtitle>
               </v-col>
-              <v-chip color="warning" class="mt-5 mr-5">{{loss}} Rwf</v-chip>
+              <v-chip color="warning" class="mt-5 mr-5">{{ loss }} Rwf</v-chip>
             </v-row>
           </v-card>
         </v-col>
       </v-row>
     </v-row>
     <v-row class="ml-4">
-      <v-col cols="12" lg="4">
+      <v-col v-if="!pieHasData">
+        <v-skeleton-loader
+          v-bind="attrs"
+          type="card-avatar, article"
+        ></v-skeleton-loader>
+      </v-col>
+      <v-col cols="12" lg="4" v-else>
         <v-card elevation="0">
           <mdb-container>
             <mdb-pie-chart
@@ -80,8 +88,25 @@
       <v-col cols="12" lg="8">
         <v-card class="mr-2">
           <v-card-title>
-            Recent transactions
+            Transactions
             <v-spacer></v-spacer>
+            <v-select
+              v-model="filterId"
+              append-icon="mdi-close"
+              label="Filer"
+              outlined
+              :items="cooperatives"
+              item-text="name"
+              item-value="user_id"
+              dense
+              class="mt-2"
+              hide-details
+              @change="
+                filter()
+                pieHasData = false
+              "
+              @click:append="getData()"
+            ></v-select>
             <v-text-field
               v-model="search"
               append-icon="mdi-magnify"
@@ -90,23 +115,19 @@
               hide-details
             ></v-text-field>
           </v-card-title>
-          <v-data-table
-            :headers="headers"
-            :items="transItems"
-            :search="search"
-          >
+          <v-data-table :headers="headers" :items="transItems" :search="search">
             <template v-slot:[`item.cooperative`]="{ item }">
-                {{item.cooperative.name}}
-              </template>
-              <template v-slot:[`item.crop`]="{ item }">
-                {{item.produce.name}}
-              </template>
-              <template v-slot:[`item.created_at`]="{ item }">
-                {{date(item.created_at)}}
-              </template>
-              <template v-slot:[`item.amount`]="{ item }">
-                {{item.amount * item.quantity}} Rwf
-              </template>
+              {{ item.cooperative.name }}
+            </template>
+            <template v-slot:[`item.crop`]="{ item }">
+              {{ item.produce.name }}
+            </template>
+            <template v-slot:[`item.created_at`]="{ item }">
+              {{ date(item.created_at) }}
+            </template>
+            <template v-slot:[`item.amount`]="{ item }">
+              {{ item.amount * item.quantity }} Rwf
+            </template>
           </v-data-table>
         </v-card>
       </v-col>
@@ -201,12 +222,12 @@ export default {
         },
       },
       pieChartData: {
-        labels: ['Sold', 'In stock', 'damaged'],
+        labels: ['Sold', 'damaged'],
         datasets: [
           {
-            data: [100, 50, 20],
-            backgroundColor: ['#46BFBD', '#FDB45C', '#E30415'],
-            hoverBackgroundColor: ['#5AD3D1', '#FFC870', '#FC2638'],
+            data: [],
+            backgroundColor: ['#46BFBD', '#FDB45C'],
+            hoverBackgroundColor: ['#5AD3D1', '#FFC870'],
           },
         ],
       },
@@ -229,27 +250,37 @@ export default {
           },
         },
       },
-      lineHasData: true,
+      pieHasData: false,
       search: '',
-        headers: [
-          {
-            text: 'Date',
-            align: 'start',
-            sortable: true,
-            value: 'created_at',
-          },
-          { text: 'cooperative', value: 'cooperative' },
-          { text: 'Action', value: 'comment' },
-          { text: 'Crop', value: 'crop' },
-          { text: 'Quantity (kg)', value: 'quantity' },
-          { text: 'Amount', value: 'amount' },
-          { text: 'Feltirizer', value: 'fertilizer' },
-          { text: 'pesticide', value: 'pesticide' },
-        ],
-        transItems: [],
-        copNum: '',
-        income:'',
-        loss: '',
+      headers: [
+        {
+          text: 'Date',
+          align: 'start',
+          sortable: true,
+          value: 'created_at',
+        },
+        { text: 'cooperative', value: 'cooperative' },
+        { text: 'Action', value: 'comment' },
+        { text: 'Crop', value: 'crop' },
+        { text: 'Quantity (kg)', value: 'quantity' },
+        { text: 'Amount', value: 'amount' },
+        { text: 'Feltirizer', value: 'fertilizer' },
+        { text: 'pesticide', value: 'pesticide' },
+      ],
+      transItems: [],
+      transactions: [],
+      cooperatives: [],
+      copNum: '',
+      income: '',
+      loss: '',
+      incomeQty: '',
+      lossQty: '',
+      filterId: '',
+      attrs: {
+        class: 'mb-6',
+        boilerplate: true,
+        elevation: 2,
+      },
     }
   },
   methods: {
@@ -267,21 +298,77 @@ export default {
       }
     },
     date(date) {
-      let item =  date.split(' ')
-      return item[1] + "-" + item[2] + "-" + item[3] + " " + item[4]
+      let item = date.split(' ')
+      return item[1] + '-' + item[2] + '-' + item[3] + ' ' + item[4]
     },
     getData() {
-      this.$axios.get(
-        "https://cooperative-management.herokuapp.com/api/admin/transactions"
-      )
-      .then(res => {
-        this.transItems = res.data.transactions
-        this.copNum = res.data.cooperatives
-        this.income = res.data.totalIncome
-        this.loss = res.data.totalLoss
-        console.log(this.transItems);
-      })
-    }
+      this.pieHasData = false
+      this.$axios
+        .get(
+          'https://cooperative-management.herokuapp.com/api/admin/transactions'
+        )
+        .then((res) => {
+          this.transactions = res.data.transactions
+          this.transItems = this.transactions
+          this.copNum = res.data.cooperatives
+          this.income = res.data.totalIncome
+          this.loss = res.data.totalLoss
+          let incomeQty = 0
+          let lossQty = 0
+          this.transactions.forEach((element) => {
+            this.cooperatives.push(element.cooperative)
+            element.type === 'sell_produce'
+              ? (incomeQty += element.quantity)
+              : element.type === 'wasted_produce'
+              ? (lossQty += element.quantity)
+              : ''
+          })
+          this.pieChartData.datasets[0].data = [incomeQty, lossQty]
+          this.pieChartData.labels = [
+            'Sold: ' + lossQty + ' kg',
+            'damaged: ' + incomeQty + ' kg',
+          ]
+        })
+        .finally(() => {
+          this.pieHasData = true
+        })
+    },
+    filter() {
+      this.$axios
+        .get(
+          'https://cooperative-management.herokuapp.com/api/admin/transactions'
+        )
+        .then((res) => {
+          this.transactions = res.data.transactions
+          this.transItems = this.transactions.filter(
+            (item) => item.cooperative.user_id === this.filterId
+          )
+          let loss = 0
+          let income = 0
+          let incomeQty = 0
+          let lossQty = 0
+          this.transItems.forEach((element) => {
+            element.type === 'sell_produce'
+              ? (income += element.amount * element.quantity)
+              : (loss += element.amount * element.quantity)
+            element.type === 'sell_produce'
+              ? (incomeQty += element.quantity)
+              : element.type === 'wasted_produce'
+              ? (lossQty += element.quantity)
+              : ''
+          })
+          this.pieChartData.datasets[0].data = [incomeQty, lossQty]
+          this.pieChartData.labels = [
+            'Sold: ' + lossQty + ' kg',
+            'damaged: ' + incomeQty + ' kg',
+          ]
+          this.income = income
+          this.loss = loss
+        })
+        .finally(() => {
+          this.pieHasData = true
+        })
+    },
   },
   layout: 'dashboard',
   mounted() {
