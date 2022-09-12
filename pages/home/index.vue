@@ -38,10 +38,21 @@
           <v-card elevation="0" class="side-overview-card">
             <v-row justify="space-between">
               <v-col>
+                <v-card-title> Total Stock In </v-card-title>
+                <v-card-subtitle> Jul, 08 2021 </v-card-subtitle>
+              </v-col>
+              <v-chip color="warning" class="mt-5 mr-5">{{ totalStock }} Kg</v-chip>
+            </v-row>
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card elevation="0" class="side-overview-card">
+            <v-row justify="space-between">
+              <v-col>
                 <v-card-title> Calculated Loss </v-card-title>
                 <v-card-subtitle> Jul, 08 2021 </v-card-subtitle>
               </v-col>
-              <v-chip color="warning" class="mt-5 mr-5">{{ loss }} Rwf</v-chip>
+              <v-chip color="#F93D3D" class="mt-5 mr-5" dark>{{ loss }} Rwf</v-chip>
             </v-row>
           </v-card>
         </v-col>
@@ -225,12 +236,12 @@ export default {
         },
       },
       pieChartData: {
-        labels: ['Sold', 'damaged'],
+        labels: [],
         datasets: [
           {
             data: [],
-            backgroundColor: ['#46BFBD', '#FDB45C'],
-            hoverBackgroundColor: ['#5AD3D1', '#FFC870'],
+            backgroundColor: ['#46BFBD', '#FDB45C', '#DE0707'],
+            hoverBackgroundColor: ['#5AD3D1', '#FFC870', '#F93D3D'],
           },
         ],
       },
@@ -285,6 +296,7 @@ export default {
         elevation: 2,
       },
       dataToDownload: [],
+      totalStock: 0,
     }
   },
   methods: {
@@ -321,10 +333,11 @@ export default {
                   (item) => item.cooperative.user_id === this.filterId
                 )
           this.copNum = res.data.cooperatives
-          this.income = res.data.totalIncome
-          this.loss = res.data.totalLoss
           let incomeQty = 0
           let lossQty = 0
+          let inStockQty = 0
+          let loss = 0
+          let income = 0
           let data = {}
           let i = 1
           this.transItems.forEach((element) => {
@@ -333,7 +346,12 @@ export default {
               ? (incomeQty += element.quantity)
               : element.type === 'wasted_produce'
               ? (lossQty += element.quantity)
-              : ''
+              : (inStockQty += element.quantity)
+            if(this.filterId) {
+              element.type === 'sell_produce'
+                ? (income += element.amount * element.quantity)
+                : (loss += element.amount * element.quantity)
+            }
             data = {
               id: i,
               cooperative: element.cooperative.name,
@@ -349,11 +367,15 @@ export default {
             this.dataToDownload.push(data)
             i++
           })
-          this.pieChartData.datasets[0].data = [incomeQty, lossQty]
+          this.pieChartData.datasets[0].data = [(inStockQty - (incomeQty + lossQty)),lossQty,incomeQty]
+          this.totalStock = inStockQty
           this.pieChartData.labels = [
+            'In Stock: ' + (inStockQty - (incomeQty + lossQty)) + ' kg',
             'Sold: ' + lossQty + ' kg',
             'damaged: ' + incomeQty + ' kg',
           ]
+          this.income = this.filterId ? income :  res.data.totalIncome
+          this.loss = this.filterId ? loss :  res.data.totalLoss
         })
         .finally(() => {
           this.pieHasData = true
