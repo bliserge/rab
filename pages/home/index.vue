@@ -9,24 +9,6 @@
       </v-row>
     </v-card>
     <v-row>
-      <!-- <v-col class="overview-cards mb-5" cols="12" lg="8" md="8" sm="8">
-        <v-row>
-          <v-card class="view-cards" elevation="0">
-            <v-card-title> OverAll Trend </v-card-title>
-            <v-card-subtitle> </v-card-subtitle>
-            <v-divider></v-divider>
-            <v-spacer />
-
-            <mdb-line-chart
-              v-if="lineHasData"
-              :data="lineChartData"
-              :options="lineChartOptions"
-              :width="1000"
-              :height="400"
-            ></mdb-line-chart>
-          </v-card>
-        </v-row>
-      </v-col> -->
       <v-row class="ml-2 mr-2 mb-2">
         <v-col>
           <v-card elevation="0" class="side-overview-card">
@@ -89,11 +71,10 @@
         <v-card class="mr-2">
           <v-card-title>
             Transactions
-            <v-spacer></v-spacer>
             <v-select
               v-model="filterId"
               append-icon="mdi-close"
-              label="Filer"
+              label="Filter by Cooperative"
               outlined
               :items="cooperatives"
               item-text="name"
@@ -102,11 +83,31 @@
               class="mt-2"
               hide-details
               @change="
-                filter()
+                getData()
                 pieHasData = false
               "
-              @click:append="getData()"
+              @click:append="
+                filterId = ''
+                getData()
+              "
             ></v-select>
+            <!-- <v-select
+              v-model="filterId"
+              append-icon="mdi-close"
+              label="Filter by date"
+              outlined
+              :items="cooperatives"
+              item-text="name"
+              item-value="user_id"
+              dense
+              class="mt-2"
+              hide-details
+              @change="
+                getData()
+                pieHasData = false
+              "
+              @click:append="filterId =''; getData()"
+            ></v-select> -->
             <v-text-field
               v-model="search"
               append-icon="mdi-magnify"
@@ -114,6 +115,17 @@
               single-line
               hide-details
             ></v-text-field>
+            <json-excel
+              class="btn btn-default"
+              :data="dataToDownload"
+              worksheet="My Worksheet"
+              name="eport.xls"
+            >
+              <v-btn dark color="green darken-3">
+                <v-icon>mdi-file-excel</v-icon>
+                Download Excel
+              </v-btn>
+            </json-excel>
           </v-card-title>
           <v-data-table :headers="headers" :items="transItems" :search="search">
             <template v-slot:[`item.cooperative`]="{ item }">
@@ -136,14 +148,8 @@
 </template>
 
 <script>
-import {
-  mdbLineChart,
-  mdbHorizontalBarChart,
-  mdbBarChart,
-  mdbPieChart,
-  mdbContainer,
-  mdbDoughnutChart,
-} from 'mdbvue'
+import { mdbPieChart, mdbContainer } from 'mdbvue'
+import JsonExcel from 'vue-json-excel'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 const date = () => {
   var today = new Date()
@@ -156,14 +162,11 @@ const date = () => {
 }
 export default {
   components: {
-    mdbLineChart,
-    mdbHorizontalBarChart,
-    mdbBarChart,
     mdbPieChart,
-    mdbDoughnutChart,
     mdbContainer,
     ValidationProvider,
     ValidationObserver,
+    JsonExcel,
   },
   data() {
     return {
@@ -281,6 +284,7 @@ export default {
         boilerplate: true,
         elevation: 2,
       },
+      dataToDownload: [],
     }
   },
   methods: {
@@ -303,25 +307,47 @@ export default {
     },
     getData() {
       this.pieHasData = false
+      this.dataToDownload = []
       this.$axios
         .get(
           'https://cooperative-management.herokuapp.com/api/admin/transactions'
         )
         .then((res) => {
           this.transactions = res.data.transactions
-          this.transItems = this.transactions
+          this.transItems =
+            this.filterId == ''
+              ? this.transactions
+              : this.transactions.filter(
+                  (item) => item.cooperative.user_id === this.filterId
+                )
           this.copNum = res.data.cooperatives
           this.income = res.data.totalIncome
           this.loss = res.data.totalLoss
           let incomeQty = 0
           let lossQty = 0
-          this.transactions.forEach((element) => {
+          let data = {}
+          let i = 1
+          this.transItems.forEach((element) => {
             this.cooperatives.push(element.cooperative)
             element.type === 'sell_produce'
               ? (incomeQty += element.quantity)
               : element.type === 'wasted_produce'
               ? (lossQty += element.quantity)
               : ''
+            data = {
+              id: i,
+              cooperative: element.cooperative.name,
+              Email: element.cooperative.email,
+              product: element.produce.name,
+              quantity: element.quantity,
+              unitPrice: element.amount,
+              totatPrice: element.amount * element.quantity,
+              fertilizer: element.fertilizer,
+              pesticide: element.pesticide,
+              date: this.date(element.created_at),
+            }
+            this.dataToDownload.push(data)
+            i++
           })
           this.pieChartData.datasets[0].data = [incomeQty, lossQty]
           this.pieChartData.labels = [
@@ -333,42 +359,56 @@ export default {
           this.pieHasData = true
         })
     },
-    filter() {
-      this.$axios
-        .get(
-          'https://cooperative-management.herokuapp.com/api/admin/transactions'
-        )
-        .then((res) => {
-          this.transactions = res.data.transactions
-          this.transItems = this.transactions.filter(
-            (item) => item.cooperative.user_id === this.filterId
-          )
-          let loss = 0
-          let income = 0
-          let incomeQty = 0
-          let lossQty = 0
-          this.transItems.forEach((element) => {
-            element.type === 'sell_produce'
-              ? (income += element.amount * element.quantity)
-              : (loss += element.amount * element.quantity)
-            element.type === 'sell_produce'
-              ? (incomeQty += element.quantity)
-              : element.type === 'wasted_produce'
-              ? (lossQty += element.quantity)
-              : ''
-          })
-          this.pieChartData.datasets[0].data = [incomeQty, lossQty]
-          this.pieChartData.labels = [
-            'Sold: ' + lossQty + ' kg',
-            'damaged: ' + incomeQty + ' kg',
-          ]
-          this.income = income
-          this.loss = loss
-        })
-        .finally(() => {
-          this.pieHasData = true
-        })
-    },
+    // filter() {
+    //   this.$axios
+    //     .get(
+    //       'https://cooperative-management.herokuapp.com/api/admin/transactions'
+    //     )
+    //     .then((res) => {
+    //       this.transactions = res.data.transactions
+    //       this.transItems = this.transactions.filter((item) => item.cooperative.user_id === this.filterId)
+    //       let loss = 0
+    //       let income = 0
+    //       let incomeQty = 0
+    //       let lossQty = 0
+    //       let data = {}
+    //       let i = 1
+    //       this.transItems.forEach((element) => {
+    //         element.type === 'sell_produce'
+    //           ? (income += element.amount * element.quantity)
+    //           : (loss += element.amount * element.quantity)
+    //         element.type === 'sell_produce'
+    //           ? (incomeQty += element.quantity)
+    //           : element.type === 'wasted_produce'
+    //           ? (lossQty += element.quantity)
+    //           : ''
+    //         data = {
+    //           id: i,
+    //           cooperative: element.cooperative.name,
+    //           Email: element.cooperative.email,
+    //           product: element.produce.name,
+    //           quantity: element.quantity,
+    //           unitPrice: element.amount,
+    //           totatPrice: element.amount * element.quantity,
+    //           fertilizer: element.fertilizer,
+    //           pesticide: element.pesticide,
+    //           date: this.date(element.created_at),
+    //         }
+    //         this.dataToDownload.push(data)
+    //         i++
+    //       })
+    //       this.pieChartData.datasets[0].data = [incomeQty, lossQty]
+    //       this.pieChartData.labels = [
+    //         'Sold: ' + lossQty + ' kg',
+    //         'damaged: ' + incomeQty + ' kg',
+    //       ]
+    //       this.income = income
+    //       this.loss = loss
+    //     })
+    //     .finally(() => {
+    //       this.pieHasData = true
+    //     })
+    // },
   },
   layout: 'dashboard',
   mounted() {
